@@ -21,11 +21,10 @@ import { userRouter } from './routes/userRoutes.js'; // Router for user-related 
 
 // Get port and MongoDB connection URI from environment variables
 const port = process.env.PORT;
-// const uri =
-//   process.env.NODE_ENV === 'development'
-//     ? process.env.LOCAL_URI
-//     : process.env.URI;
-const uri = process.env.URI;
+const uri =
+  process.env.NODE_ENV === 'development'
+    ? process.env.LOCAL_URI
+    : process.env.URI;
 // Get the directory name of the current module
 const __dirname = getDirname(import.meta.url);
 
