@@ -18,6 +18,7 @@ import { ApiError, ErrorHandler } from './controllers/errorController.js'; // Cu
 import { authRouter } from './routes/authRoutes.js'; // Router for authentication-related routes
 import { getDirname, limiter } from './utils/util.js'; // Custom utility functions
 import { userRouter } from './routes/userRoutes.js'; // Router for user-related routes
+import { blogRouter } from './routes/blogRoutes.js';
 
 // Get port and MongoDB connection URI from environment variables
 const port = process.env.PORT;
@@ -62,7 +63,7 @@ app.use(hpp());
 // 2) ROUTES
 
 // welcome to the homepage
-app.use('/', (req, res) => {
+app.use('/home', (req, res) => {
   return res.send('welcome to the home page');
 });
 
@@ -72,6 +73,7 @@ app.use('/auth', authRouter);
 // Use the user router for '/users' routes
 app.use('/users', userRouter);
 
+app.use('/blog', blogRouter);
 // Middleware to handle routes that are not found
 app.all('*', (req, res, next) => {
   next(
