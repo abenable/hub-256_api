@@ -6,13 +6,26 @@ import { protect, restrictTo } from '../controllers/authController.js';
 const router = express.Router();
 
 router.post('/post', protect, async (req, res, next) => {
-  const { title, body, tags, category } = req.body;
+  const {
+    title,
+    url,
+    description,
+    urlToImage,
+    content,
+    category,
+    tags,
+    publishedAt,
+  } = req.body;
   try {
     const blog = await BlogModel.create({
       title,
-      body,
+      url,
+      description,
+      urlToImage,
+      content,
       category,
       tags,
+      publishedAt,
       author: req.user.id,
     });
 
@@ -47,7 +60,7 @@ router.post(
   }
 );
 
-router.get('/all', protect, async (req, res, next) => {
+router.get('/all', async (req, res, next) => {
   try {
     const blogs = await BlogModel.find();
     res.status(200).json({ blogs });
@@ -66,49 +79,6 @@ router.get('/search', async (req, res, next) => {
   } catch (error) {
     console.error(error);
     next(new ApiError(500, 'internal server error'));
-  }
-});
-
-router.delete('/delete/:id', protect, async (req, res, next) => {
-  try {
-    const blog = await BlogModel.findById(req.params.id);
-    if (!blog) {
-      res.status(404).json({
-        status: 'Failed',
-        message: 'Blog not found..',
-      });
-    }
-    if (req.user.id == blog.author.id || req.user.role == 'admin') {
-      const response = await BlogModel.findByIdAndDelete(blog.id);
-      res.status(200).json({
-        status: 'success',
-        message: response,
-      });
-    } else {
-      return res.status(403).json({
-        status: 'Failed',
-        message: 'You are not allowed to perform this action.',
-      });
-    }
-  } catch (error) {
-    console.error(error.message);
-    next(new ApiError(500, 'Internal server error.'));
-  }
-});
-
-router.get('/trending', async (req, res) => {
-  const timeSpan = 7 * 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-  const currentTime = Date.now();
-
-  try {
-    const trendingPosts = await BlogModel.find({
-      createdAt: { $gte: currentTime - timeSpan },
-    })
-      .sort({ reads: -1 })
-      .limit(10);
-    res.json(trendingPosts);
-  } catch (error) {
-    res.status(500).json({ error: 'Could not retrieve trending posts.' });
   }
 });
 
@@ -132,6 +102,22 @@ router.get('/latest', async (req, res) => {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
   }
 });
+
+// router.get('/trending', async (req, res) => {
+//   const timeSpan = 7 * 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+//   const currentTime = Date.now();
+
+//   try {
+//     const trendingPosts = await BlogModel.find({
+//       createdAt: { $gte: currentTime - timeSpan },
+//     })
+//       .sort({ reads: -1 })
+//       .limit(10);
+//     res.json(trendingPosts);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Could not retrieve trending posts.' });
+//   }
+// });
 
 // Route to randomly select a recent post as recommended for one hour
 router.get('/recommended', async (req, res) => {
@@ -168,6 +154,33 @@ router.get('/recommended', async (req, res) => {
     res
       .status(500)
       .json({ error: 'Could not retrieve or set recommended post.' });
+  }
+});
+
+router.delete('/delete/:id', protect, async (req, res, next) => {
+  try {
+    const blog = await BlogModel.findById(req.params.id);
+    if (!blog) {
+      res.status(404).json({
+        status: 'Failed',
+        message: 'Blog not found..',
+      });
+    }
+    if (req.user.id == blog.author.id || req.user.role == 'admin') {
+      const response = await BlogModel.findByIdAndDelete(blog.id);
+      res.status(200).json({
+        status: 'success',
+        message: response,
+      });
+    } else {
+      return res.status(403).json({
+        status: 'Failed',
+        message: 'You are not allowed to perform this action.',
+      });
+    }
+  } catch (error) {
+    console.error(error.message);
+    next(new ApiError(500, 'Internal server error.'));
   }
 });
 

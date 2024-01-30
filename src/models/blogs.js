@@ -2,29 +2,46 @@ import mongoose from 'mongoose';
 
 const blogSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  body: {
+
+  description: {
     type: String,
     required: true,
   },
+
+  url: {
+    type: String,
+    required: true,
+  },
+  urlToImage: {
+    type: String,
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+
   category: {
     type: String,
-    required: true,
-    default: 'Lifestyle',
+    default: 'Entertainment',
   },
+
   tags: {
     type: Array,
-    required: true,
     default: [],
   },
 
-  createdAt: { type: Date, default: Date.now },
+  publishedAt: {
+    type: Date,
+    default: Date.now,
+  },
+
   author: {
     type: mongoose.Schema.ObjectId,
     ref: 'users',
   },
   recommendedByEditor: { type: Boolean, default: false },
   likes: { type: Number, default: 0 },
-  views: { type: Number, default: 0 },
 });
 
 blogSchema.pre('save', async function (next) {
