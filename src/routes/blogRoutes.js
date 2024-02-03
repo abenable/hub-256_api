@@ -1,7 +1,11 @@
 import express from 'express';
+import axios from 'axios';
+
 import { ApiError } from '../controllers/errorController.js';
 import { BlogModel } from '../models/blogs.js';
 import { protect, restrictTo } from '../controllers/authController.js';
+import getArticle from '../utils/getArticle.js';
+import { assign } from 'nodemailer/lib/shared/index.js';
 
 const router = express.Router();
 
@@ -192,6 +196,42 @@ router.delete('/del-all', protect, restrictTo('admin'), async (req, res) => {
     console.error(error);
   }
 });
+
+router.post(
+  '/addposts',
+  protect,
+  restrictTo('admin'),
+  async (req, res, next) => {
+    try {
+      const url =
+        'https://newsapi.org/v2/everything?' +
+        `q=${req.body.query}&` +
+        'language=en&' +
+        `apiKey=${process.env.NEWSAPI_KEY}`;
+
+      const response = await axios.get(url);
+      const top_articles = response.data.articles.slice(0, 16);
+      console.log(top_articles);
+
+      const final_posts = top_articles.map(async (article) => {
+        let post_content = await getArticle(article);
+        return { ...article, content: post_content };
+      });
+      console.log(final_posts);
+
+      const blogs = await BlogModel.create(final_posts);
+
+      res.status(201).json({
+        status: 'success',
+        blogs,
+        message: 'Blogs created successfully.',
+      });
+    } catch (error) {
+      console.error(error);
+      next(new ApiError(500, 'internal server error'));
+    }
+  }
+);
 
 router.all('*', (req, res, next) => {
   next(
