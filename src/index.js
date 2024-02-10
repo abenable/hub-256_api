@@ -11,7 +11,6 @@ import cookieParser from 'cookie-parser'; // Middleware to parse cookies
 
 import helmet from 'helmet'; // Middleware for adding various security-related HTTP headers
 import mongoSanitize from 'express-mongo-sanitize'; // Middleware to prevent MongoDB query injection
-import xss from 'xss-clean'; // Middleware to sanitize user input from cross-site scripting (XSS) attacks
 import hpp from 'hpp'; // Middleware to protect against HTTP Parameter Pollution attacks
 
 import { ApiError, ErrorHandler } from './controllers/errorController.js'; // Custom error handling classes
@@ -53,9 +52,6 @@ app.use('/', limiter);
 
 // Prevent MongoDB query injection attacks
 app.use(mongoSanitize());
-
-// Sanitize user input to prevent cross-site scripting attacks
-app.use(xss());
 
 // Prevent HTTP Parameter Pollution attacks
 app.use(hpp());

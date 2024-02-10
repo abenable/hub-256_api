@@ -4,7 +4,6 @@ import axios from 'axios';
 import { ApiError } from '../controllers/errorController.js';
 import { BlogModel } from '../models/blogs.js';
 import { protect, restrictTo } from '../controllers/authController.js';
-import getArticle from '../utils/getArticle.js';
 import { assign } from 'nodemailer/lib/shared/index.js';
 
 const router = express.Router();
@@ -43,26 +42,6 @@ router.post('/post', protect, async (req, res, next) => {
     next(new ApiError(500, 'internal server error'));
   }
 });
-
-router.post(
-  '/postMultiple',
-  protect,
-  restrictTo('admin'),
-  async (req, res, next) => {
-    try {
-      const blogs = await BlogModel.create(req.body);
-
-      res.status(201).json({
-        status: 'success',
-        blogs,
-        message: 'Blogs created successfully.',
-      });
-    } catch (error) {
-      console.error(error);
-      next(new ApiError(500, 'internal server error'));
-    }
-  }
-);
 
 router.get('/all', async (req, res, next) => {
   try {
@@ -104,60 +83,6 @@ router.get('/latest', async (req, res) => {
     res.json(latestPosts);
   } catch (error) {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
-  }
-});
-
-// router.get('/trending', async (req, res) => {
-//   const timeSpan = 7 * 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-//   const currentTime = Date.now();
-
-//   try {
-//     const trendingPosts = await BlogModel.find({
-//       createdAt: { $gte: currentTime - timeSpan },
-//     })
-//       .sort({ reads: -1 })
-//       .limit(10);
-//     res.json(trendingPosts);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Could not retrieve trending posts.' });
-//   }
-// });
-
-// Route to randomly select a recent post as recommended for one hour
-router.get('/recommended', async (req, res) => {
-  try {
-    // Calculate the date one week ago from the current date
-    const aWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-    // Find all posts created within the last week
-    const recentPosts = await BlogModel.find({
-      createdAt: { $gte: aWeekAgo },
-    });
-
-    if (recentPosts.length === 0) {
-      return res.status(404).json({ error: 'No recent posts found.' });
-    }
-
-    // Randomly select one post from the recent posts
-    const randomIndex = Math.floor(Math.random() * recentPosts.length);
-    const recommendedPost = recentPosts[randomIndex];
-
-    // Set the recommendedByEditor field to true for the selected post
-    recommendedPost.recommendedByEditor = true;
-    await recommendedPost.save();
-
-    // Schedule a task to reset the recommendedByEditor field to false after one hour
-    setTimeout(async () => {
-      recommendedPost.recommendedByEditor = false;
-      await recommendedPost.save();
-    }, 3600000); // One hour in milliseconds
-
-    res.json(recommendedPost);
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ error: 'Could not retrieve or set recommended post.' });
   }
 });
 
@@ -210,16 +135,7 @@ router.post(
         `apiKey=${process.env.NEWSAPI_KEY}`;
 
       const response = await axios.get(url);
-      const top_articles = response.data.articles.slice(0, 16);
-      console.log(top_articles);
-
-      const final_posts = top_articles.map(async (article) => {
-        let post_content = await getArticle(article);
-        return { ...article, content: post_content };
-      });
-      console.log(final_posts);
-
-      const blogs = await BlogModel.create(final_posts);
+      const blogs = await BlogModel.create(response.data.articles.slice(0, 10));
 
       res.status(201).json({
         status: 'success',
