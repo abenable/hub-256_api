@@ -4,7 +4,6 @@ import axios from 'axios';
 import { ApiError } from '../controllers/errorController.js';
 import { BlogModel } from '../models/blogs.js';
 import { protect, restrictTo } from '../controllers/authController.js';
-import { assign } from 'nodemailer/lib/shared/index.js';
 
 const router = express.Router();
 
@@ -135,11 +134,11 @@ router.post(
         `apiKey=${process.env.NEWSAPI_KEY}`;
 
       const response = await axios.get(url);
-      const blogs = await BlogModel.create(response.data.articles.slice(0, 10));
+      // const blogs = await BlogModel.create(response.data.articles.slice(0, 10));
 
       res.status(201).json({
         status: 'success',
-        blogs,
+        Stories: response.data.articles,
         message: 'Blogs created successfully.',
       });
     } catch (error) {
