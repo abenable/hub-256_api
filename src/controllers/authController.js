@@ -202,7 +202,7 @@ export const Register = async (req, res, next) => {
 // Handler for admin user registration
 export const AdminRegister = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     const checkemail = await UserModel.findOne({ email });
     if (checkemail) {
@@ -211,8 +211,7 @@ export const AdminRegister = async (req, res, next) => {
       );
     }
     const newUser = new UserModel({
-      firstName,
-      lastName,
+      username,
       email,
       role: 'admin',
       password,
@@ -260,9 +259,7 @@ export const Login = async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
-      message: user.username
-        ? `Logged in as ${user.username}`
-        : 'Logged in as admin',
+      message: `Logged in as ${user.username}`,
       access_token,
       user,
     });
