@@ -62,7 +62,7 @@ app.use(hpp());
  * @param {Object} res - The response object
  * @returns {Object} - The response object with a welcome message
  */
-app.use('/home', (req, res) => {
+app.use('/', (req, res) => {
   return res.send('welcome to the home page');
 });
 
