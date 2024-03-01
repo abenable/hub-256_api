@@ -259,7 +259,7 @@ export const Login = async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
-      message: `Logged in as ${user.username}`,
+      message: `Logged in as ${user.username.toUpperCase()}`,
       access_token,
       user,
     });
