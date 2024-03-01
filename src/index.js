@@ -56,15 +56,7 @@ app.use(mongoSanitize());
  */
 app.use(hpp());
 
-/**
- * Home route
- * @param {Object} req - The request object
- * @param {Object} res - The response object
- * @returns {Object} - The response object with a welcome message
- */
-app.use('/', (req, res) => {
-  return res.send('welcome to the home page');
-});
+//Routes
 
 /**
  * Authentication routes
@@ -81,6 +73,15 @@ app.use('/users', userRouter);
  */
 app.use('/blog', blogRouter);
 
+/**
+ * Home route
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @returns {Object} - The response object with a welcome message
+ */
+app.use('/', (req, res) => {
+  return res.send('welcome to the home page');
+});
 /**
  * Handle all other routes that are not found
  * @param {Object} req - The request object
