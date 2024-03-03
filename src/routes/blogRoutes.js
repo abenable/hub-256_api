@@ -73,9 +73,7 @@ router.get('/top', async (req, res) => {
 
 router.get('/latest', async (req, res) => {
   try {
-    const latestPosts = await BlogModel.find()
-      .sort({ createdAt: -1 })
-      .limit(10);
+    const latestPosts = await BlogModel.find().sort({ createdAt: -1 }).limit(6);
     // Retrieve latest 10 posts
     res.json(latestPosts);
   } catch (error) {
