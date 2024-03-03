@@ -123,11 +123,7 @@ router.post(
   restrictTo('admin'),
   async (req, res, next) => {
     try {
-      const url =
-        'https://newsapi.org/v2/everything?' +
-        `q=${req.body.query}&` +
-        'language=en&' +
-        `apiKey=${process.env.NEWSAPI_KEY}`;
+      const url = `https://newsapi.org/v2/everything?q=${req.body.query}&from=2024-02-29&to=2024-03-03&sortBy=publishedAt&apiKey=${process.env.NEWSAPI_KEY}&language=en`;
 
       const response = await axios.get(url);
 
