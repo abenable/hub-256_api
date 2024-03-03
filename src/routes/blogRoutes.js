@@ -131,6 +131,22 @@ router.post(
 
       const response = await axios.get(url);
 
+      const top15 = response.data.articles.slice(0, 15);
+      // how can i pick the first 15 of response.data.articles
+
+      const blogs = top15.map(async (blog) => {
+        await BlogModel.create({
+          title: blog.title,
+          url: blog.url,
+          description: blog.description,
+          urlToImage: blog.urlToImage,
+          content: blog.content,
+          category: req.body.query,
+          publishedAt: blog.publishedAt,
+          author: req.user.id,
+        });
+      });
+
       res.status(201).json({
         status: 'success',
         Stories: response.data.articles,
