@@ -26,11 +26,6 @@ const blogSchema = new mongoose.Schema({
     default: 'Entertainment',
   },
 
-  tags: {
-    type: Array,
-    default: [],
-  },
-
   publishedAt: {
     type: Date,
     default: Date.now,

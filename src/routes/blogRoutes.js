@@ -15,7 +15,6 @@ router.post('/post', protect, async (req, res, next) => {
     urlToImage,
     content,
     category,
-    tags,
     publishedAt,
   } = req.body;
   try {
@@ -26,7 +25,6 @@ router.post('/post', protect, async (req, res, next) => {
       urlToImage,
       content,
       category,
-      tags,
       publishedAt,
       author: req.user.id,
     });
@@ -134,7 +132,6 @@ router.post(
         `apiKey=${process.env.NEWSAPI_KEY}`;
 
       const response = await axios.get(url);
-      // const blogs = await BlogModel.create(response.data.articles.slice(0, 10));
 
       res.status(201).json({
         status: 'success',
