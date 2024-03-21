@@ -62,19 +62,11 @@ router.get('/search', async (req, res, next) => {
   }
 });
 
-router.get('/top', async (req, res) => {
-  try {
-    const topPosts = await BlogModel.find().sort({ likes: -1 }).limit(10); // Retrieve top 10 posts
-    res.json(topPosts);
-  } catch (error) {
-    res.status(500).json({ error: 'Could not retrieve top posts.' });
-  }
-});
-
 router.get('/latest', async (req, res) => {
   try {
-    const latestPosts = await BlogModel.find().sort({ createdAt: -1 }).limit(6);
-    // Retrieve latest 10 posts
+    const latestPosts = await BlogModel.find()
+      .sort({ publishedAt: -1 })
+      .limit(6);
     res.json(latestPosts);
   } catch (error) {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
