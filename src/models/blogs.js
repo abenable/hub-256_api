@@ -10,8 +10,8 @@ const blogSchema = new mongoose.Schema({
 
   url: {
     type: String,
-    required: true,
   },
+
   urlToImage: {
     type: String,
   },
@@ -22,7 +22,7 @@ const blogSchema = new mongoose.Schema({
 
   category: {
     type: String,
-    default: 'Entertainment',
+    required: true,
   },
 
   publishedAt: {
@@ -34,8 +34,8 @@ const blogSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'users',
   },
+
   recommendedByEditor: { type: Boolean, default: false },
-  likes: { type: Number, default: 0 },
 });
 
 blogSchema.pre('save', async function (next) {

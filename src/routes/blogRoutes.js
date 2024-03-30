@@ -53,7 +53,7 @@ router.get('/all', async (req, res, next) => {
 router.get('/search', async (req, res, next) => {
   try {
     const blogs = await BlogModel.find({
-      $text: { $search: req.body.keyword },
+      $text: { $search: req.params.query },
     });
     res.status(200).json({ blogs });
   } catch (error) {
@@ -70,6 +70,18 @@ router.get('/latest', async (req, res) => {
     res.json(latestPosts);
   } catch (error) {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
+  }
+});
+
+router.get('/recommended', async (req, res, next) => {
+  try {
+    const recommendedPosts = await BlogModel.find({
+      recommendedByEditor: true,
+    });
+    res.json(recommendedPosts);
+  } catch (error) {
+    console.error(error);
+    next(new ApiError(500, 'internal server error'));
   }
 });
 
