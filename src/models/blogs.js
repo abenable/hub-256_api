@@ -12,7 +12,7 @@ const blogSchema = new mongoose.Schema({
     type: String,
   },
 
-  urlToImage: {
+  urlToImg: {
     type: String,
   },
   content: {
