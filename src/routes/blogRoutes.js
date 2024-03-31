@@ -68,10 +68,10 @@ router.get('/latest', async (req, res) => {
 
 router.get('/recommended', async (req, res, next) => {
   try {
-    const recommendedPosts = await BlogModel.find({
+    const recommendedPost = await BlogModel.findOne({
       recommendedByEditor: true,
     });
-    res.json(recommendedPosts);
+    res.json(recommendedPost);
   } catch (error) {
     console.error(error);
     next(new ApiError(500, 'internal server error'));
