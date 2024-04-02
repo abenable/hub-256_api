@@ -51,6 +51,13 @@ app.use('/', limiter);
  */
 app.use(mongoSanitize());
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  // ... other headers
+  next();
+});
+
 /**
  * Protect against HTTP Parameter Pollution attacks
  */

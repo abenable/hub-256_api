@@ -8,25 +8,16 @@ import { protect, restrictTo } from '../controllers/authController.js';
 const router = express.Router();
 
 router.post('/post', protect, async (req, res, next) => {
-  const {
-    title,
-    url,
-    description,
-    urlToImage,
-    content,
-    category,
-    tags,
-    publishedAt,
-  } = req.body;
+  const { title, url, description, urlToImg, content, category, publishedAt } =
+    req.body;
   try {
     const blog = await BlogModel.create({
       title,
       url,
       description,
-      urlToImage,
+      urlToImg,
       content,
       category,
-      tags,
       publishedAt,
       author: req.user.id,
     });
@@ -55,7 +46,7 @@ router.get('/all', async (req, res, next) => {
 router.get('/search', async (req, res, next) => {
   try {
     const blogs = await BlogModel.find({
-      $text: { $search: req.body.keyword },
+      $text: { $search: req.params.query },
     });
     res.status(200).json({ blogs });
   } catch (error) {
@@ -64,24 +55,26 @@ router.get('/search', async (req, res, next) => {
   }
 });
 
-router.get('/top', async (req, res) => {
-  try {
-    const topPosts = await BlogModel.find().sort({ likes: -1 }).limit(10); // Retrieve top 10 posts
-    res.json(topPosts);
-  } catch (error) {
-    res.status(500).json({ error: 'Could not retrieve top posts.' });
-  }
-});
-
 router.get('/latest', async (req, res) => {
   try {
     const latestPosts = await BlogModel.find()
-      .sort({ createdAt: -1 })
-      .limit(10);
-    // Retrieve latest 10 posts
+      .sort({ publishedAt: -1 })
+      .limit(6);
     res.json(latestPosts);
   } catch (error) {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
+  }
+});
+
+router.get('/recommended', async (req, res, next) => {
+  try {
+    const recommendedPost = await BlogModel.findOne({
+      recommendedByEditor: true,
+    });
+    res.json(recommendedPost);
+  } catch (error) {
+    console.error(error);
+    next(new ApiError(500, 'internal server error'));
   }
 });
 
@@ -127,14 +120,25 @@ router.post(
   restrictTo('admin'),
   async (req, res, next) => {
     try {
-      const url =
-        'https://newsapi.org/v2/everything?' +
-        `q=${req.body.query}&` +
-        'language=en&' +
-        `apiKey=${process.env.NEWSAPI_KEY}`;
+      const url = `https://newsapi.org/v2/everything?q=${req.body.query}&from=2024-02-29&to=2024-03-03&sortBy=publishedAt&apiKey=${process.env.NEWSAPI_KEY}&language=en`;
 
       const response = await axios.get(url);
-      // const blogs = await BlogModel.create(response.data.articles.slice(0, 10));
+
+      const top15 = response.data.articles.slice(0, 15);
+      // how can i pick the first 15 of response.data.articles
+
+      const blogs = top15.map(async (blog) => {
+        await BlogModel.create({
+          title: blog.title,
+          url: blog.url,
+          description: blog.description,
+          urlToImage: blog.urlToImage,
+          content: blog.content,
+          category: req.body.query,
+          publishedAt: blog.publishedAt,
+          author: req.user.id,
+        });
+      });
 
       res.status(201).json({
         status: 'success',
