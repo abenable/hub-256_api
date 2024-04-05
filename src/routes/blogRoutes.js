@@ -43,6 +43,16 @@ router.get('/all', async (req, res, next) => {
   }
 });
 
+router.get('/category/:category', async (req, res, next) => {
+  try {
+    const blogs = await BlogModel.find({ category: req.params.category });
+    res.status(200).json({ blogs });
+  } catch (error) {
+    console.error(error);
+    next(new ApiError(500, 'internal server error'));
+  }
+});
+
 router.get('/search', async (req, res, next) => {
   try {
     const blogs = await BlogModel.find({
@@ -59,7 +69,7 @@ router.get('/latest', async (req, res) => {
   try {
     const latestPosts = await BlogModel.find()
       .sort({ publishedAt: -1 })
-      .limit(6);
+      .limit(2);
     res.json(latestPosts);
   } catch (error) {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
