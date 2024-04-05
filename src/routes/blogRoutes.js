@@ -69,7 +69,7 @@ router.get('/latest', async (req, res) => {
   try {
     const latestPosts = await BlogModel.find()
       .sort({ publishedAt: -1 })
-      .limit(6);
+      .limit(2);
     res.json(latestPosts);
   } catch (error) {
     res.status(500).json({ error: 'Could not retrieve latest posts.' });
