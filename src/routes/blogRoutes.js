@@ -53,6 +53,22 @@ router.get('/category/:category', async (req, res, next) => {
   }
 });
 
+router.get('/id/:id', async (req, res, next) => {
+  try {
+    const blog = await BlogModel.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).json({
+        status: 'Failed',
+        message: 'Blog not found.',
+      });
+    }
+    res.status(200).json(blog);
+  } catch (error) {
+    console.error(error);
+    next(new ApiError(500, 'internal server error'));
+  }
+});
+
 router.get('/search', async (req, res, next) => {
   try {
     const blogs = await BlogModel.find({
