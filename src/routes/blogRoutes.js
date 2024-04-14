@@ -13,12 +13,10 @@ router.post('/post', protect, async (req, res, next) => {
   try {
     const blog = await BlogModel.create({
       title,
-      url,
-      description,
-      urlToImg,
-      content,
       category,
-      publishedAt,
+      description,
+      content,
+      urlToImg,
       author: req.user.id,
     });
 
