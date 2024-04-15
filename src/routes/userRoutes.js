@@ -62,7 +62,8 @@ router.get(
   async (req, res, next) => {
     try {
       const subscribers = await SubscriberModel.find({ active: true });
-      res.status(200).json(subscribers);
+      const emails = subscribers.map((item) => item.email);
+      res.status(200).json(emails);
     } catch (error) {
       console.error(error);
       next(new ApiError(500, 'internal server error'));
