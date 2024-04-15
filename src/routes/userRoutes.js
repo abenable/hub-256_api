@@ -37,6 +37,39 @@ router.post('/subscribe', async (req, res, next) => {
   }
 });
 
+router.patch('/unsubscribe', async (req, res, next) => {
+  try {
+    const subscriber = await SubscriberModel.findOne({ email: req.body.email });
+    if (!subscriber) {
+      return next(new ApiError(404, 'Email not found'));
+    }
+    subscriber.active = false;
+    await subscriber.save();
+    res.status(200).json({
+      status: 'success',
+      message: 'Unsubscribed successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    next(new ApiError(500, 'internal server error'));
+  }
+});
+
+router.get(
+  '/subscribers',
+  protect,
+  restrictTo('admin'),
+  async (req, res, next) => {
+    try {
+      const subscribers = await SubscriberModel.find({ active: true });
+      res.status(200).json(subscribers);
+    } catch (error) {
+      console.error(error);
+      next(new ApiError(500, 'internal server error'));
+    }
+  }
+);
+
 router.get(
   '/subscribers',
   protect,
