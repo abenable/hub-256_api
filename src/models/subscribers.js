@@ -4,6 +4,7 @@ const subscriberSchema = new mongoose.Schema({
   username: { type: String },
   email: { type: String, required: true, unique: true },
   image: { type: String },
+  active: { type: Boolean, default: true },
   subscribedAt: { type: Date },
 });
 
