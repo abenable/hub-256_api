@@ -71,21 +71,6 @@ router.get(
   }
 );
 
-router.get(
-  '/subscribers',
-  protect,
-  restrictTo('admin'),
-  async (req, res, next) => {
-    try {
-      const subscribers = await SubscriberModel.find();
-      res.status(200).json(subscribers);
-    } catch (error) {
-      console.error(error);
-      next(new ApiError(500, 'internal server error'));
-    }
-  }
-);
-
 router.all('*', (req, res, next) => {
   next(
     new ApiError(404, `Oooops!! Can't find ${req.originalUrl} on this server!`)
